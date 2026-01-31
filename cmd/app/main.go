@@ -1,14 +1,17 @@
 package main
 
 import (
-	"net/http"
+	"sprin1/internal/http"
+	"sprin1/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.Default()
+	router := gin.Default()
 
-	_ = http.ListenAndServe(":8080", r)
+	userService := service.NewUserService()
+	http.RegisterRoutes(router, userService)
 
+	router.Run(":8080")
 }
