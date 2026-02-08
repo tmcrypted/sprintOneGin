@@ -2,4 +2,4 @@
 
 делаем user service без базы данных.
 
-upd
+upd 1.1 Добавляем бд postgresql

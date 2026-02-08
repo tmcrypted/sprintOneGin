@@ -1,0 +1,16 @@
+services:
+  pgdb:
+    image: "postgres:17-alpine"
+    container_name: "pgdb"
+    environment:
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: pwd123
+      POSTGRES_DB: db_test
+    ports:
+      - "54320:5432" 
+      # Тут 54320 тк 5432 занят, на компе есть postgre на таком порту. В контейнере порт дефолтный, а снаружи порт 54320
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
