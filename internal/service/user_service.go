@@ -1,65 +1,56 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"sync"
+
+	"sprin1/internal/model"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+type userService struct {
+	repo UserRepository
 }
 
-type UserService interface {
-	CreateUser(name string, age int) (User, error)
-	GetUser(id int) (User, error)
-	GetAllUsers() []User
-}
-type inMemoryUserService struct {
-	mu     sync.RWMutex
-	users  map[int]User
-	nextID int
+// NewUserService возвращает сервис пользователей, работающий с БД через репозиторий.
+func NewUserService(repo UserRepository) *userService {
+	return &userService{repo: repo}
 }
 
-func NewUserService() UserService {
-	return &inMemoryUserService{
-		users:  make(map[int]User),
-		nextID: 1,
+func (s *userService) CreateUser(ctx context.Context, email, password, fio string, role model.UserRole) (*model.User, error) {
+	if email == "" {
+		return nil, errors.New("email is required")
 	}
-}
-
-func (s *inMemoryUserService) CreateUser(name string, age int) (User, error) {
-	if name == "" {
-		return User{}, errors.New("name is required")
+	if password == "" {
+		return nil, errors.New("password is required")
 	}
-	if age < 0 || age > 150 {
-		return User{}, errors.New("age must be between 0 and 150")
+	if fio == "" {
+		return nil, errors.New("fio is required")
 	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	user := User{ID: s.nextID, Name: name, Age: age}
-	s.users[s.nextID] = user
-	s.nextID++
-	return user, nil
-}
-
-func (s *inMemoryUserService) GetUser(id int) (User, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	user, ok := s.users[id]
-	if !ok {
-		return User{}, errors.New("user not found")
+	if role == "" {
+		role = model.RoleWorker
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user := &model.User{
+		Email:        email,
+		PasswordHash: string(hash),
+		Role:         role,
+		FIO:          fio,
+	}
+	if err := s.repo.Create(ctx, user); err != nil {
+		return nil, err
 	}
 	return user, nil
 }
 
-func (s *inMemoryUserService) GetAllUsers() []User {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	list := make([]User, 0, len(s.users))
-	for _, u := range s.users {
-		list = append(list, u)
-	}
-	return list
+func (s *userService) GetUser(ctx context.Context, id int64) (*model.User, error) {
+	return s.repo.GetByID(ctx, id)
+}
+
+func (s *userService) GetAllUsers(ctx context.Context) ([]*model.User, error) {
+	return s.repo.GetAll(ctx)
 }

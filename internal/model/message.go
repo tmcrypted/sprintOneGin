@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// Message — сообщение в рамках сделки (deal = application со status=accepted).
+// Message — сообщение в рамках сделки
 type Message struct {
 	ID        int64     `json:"id" db:"id"`
 	DealID    int64     `json:"deal_id" db:"deal_id"`
