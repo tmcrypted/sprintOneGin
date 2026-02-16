@@ -86,7 +86,7 @@ CREATE TABLE reviews (
     pvz_id         BIGINT NOT NULL REFERENCES pvz(id) ON DELETE CASCADE,
     author_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     target_user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    rating         SMALLINT NOT NULL
+    rating         SMALLINT NOT NULL,
     body           TEXT,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(deal_id, author_id)

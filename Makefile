@@ -21,5 +21,5 @@ migrate-up:
 
 migrate-down:
 	@echo "Откатываю последнюю миграцию..."
-	@goose -dir ./migrations/sqlmigrations $(GOOSE_DRIVER) $(GOOSE_DBSTRING) down
+	@goose -dir ./internal/migrations $(GOOSE_DRIVER) $(GOOSE_DBSTRING) down
 	@echo "Миграция откачена"
