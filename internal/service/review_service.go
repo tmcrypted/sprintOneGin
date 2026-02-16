@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"sprin1/internal/delivery/http/dto"
 	"sprin1/internal/model"
 )
 
@@ -37,26 +38,26 @@ func (s *reviewService) runRatingUpdater() {
 	}
 }
 
-func (s *reviewService) CreateReview(ctx context.Context, dealID, pvzID, authorID, targetUserID int64, rating int, body *string) (*model.Review, error) {
-	if rating < 1 || rating > 5 {
+func (s *reviewService) CreateReview(ctx context.Context, body dto.CreateReviewRequest) (*model.Review, error) {
+	if body.Rating < 1 || body.Rating > 5 {
 		return nil, errors.New("rating must be between 1 and 5")
 	}
 	review := &model.Review{
-		DealID:       dealID,
-		PvzID:        pvzID,
-		AuthorID:     authorID,
-		TargetUserID: targetUserID,
-		Rating:       rating,
-		Body:         body,
+		DealID:       body.DealID,
+		PvzID:        body.PvzID,
+		AuthorID:     body.AuthorID,
+		TargetUserID: body.TargetUserID,
+		Rating:       body.Rating,
+		Body:         body.Body,
 	}
 	if err := s.reviewRepo.Create(ctx, review); err != nil {
 		return nil, err
 	}
 	go func() {
 		select {
-		case s.ratingCh <- targetUserID:
+		case s.ratingCh <- body.TargetUserID:
 		default:
-			log.Printf("review: rating update queue full, skipping target_user_id=%d", targetUserID)
+			log.Printf("review: rating update queue full, skipping target_user_id=%d", body.TargetUserID)
 		}
 	}()
 	return review, nil

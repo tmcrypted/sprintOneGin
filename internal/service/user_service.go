@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"sprin1/internal/delivery/http/dto"
 	"sprin1/internal/model"
 
 	"golang.org/x/crypto/bcrypt"
@@ -18,28 +19,28 @@ func NewUserService(repo UserRepository) *userService {
 	return &userService{repo: repo}
 }
 
-func (s *userService) CreateUser(ctx context.Context, email, password, fio string, role model.UserRole) (*model.User, error) {
-	if email == "" {
+func (s *userService) CreateUser(ctx context.Context, body dto.CreateUserRequest) (*model.User, error) {
+	if body.Email == "" {
 		return nil, errors.New("email is required")
 	}
-	if password == "" {
+	if body.Password == "" {
 		return nil, errors.New("password is required")
 	}
-	if fio == "" {
+	if body.FIO == "" {
 		return nil, errors.New("fio is required")
 	}
-	if role == "" {
-		role = model.RoleWorker
+	if body.Role == "" {
+		body.Role = model.RoleWorker
 	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 	user := &model.User{
-		Email:        email,
+		Email:        body.Email,
 		PasswordHash: string(hash),
-		Role:         role,
-		FIO:          fio,
+		Role:         body.Role,
+		FIO:          body.FIO,
 	}
 	if err := s.repo.Create(ctx, user); err != nil {
 		return nil, err

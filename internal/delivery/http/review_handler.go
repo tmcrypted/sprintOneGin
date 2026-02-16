@@ -20,8 +20,7 @@ func createReview(reviewService ReviewService) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		review, err := reviewService.CreateReview(c.Request.Context(),
-			body.DealID, body.PvzID, body.AuthorID, body.TargetUserID, body.Rating, body.Body)
+		review, err := reviewService.CreateReview(c.Request.Context(), body)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

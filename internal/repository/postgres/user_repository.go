@@ -55,7 +55,11 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*model.User, error) {
 		}
 		list = append(list, &u)
 	}
-	return list, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return list, nil
 }
 
 func (r *UserRepository) UpdateRatingAvg(ctx context.Context, userID int64, avg float64) error {

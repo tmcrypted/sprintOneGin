@@ -11,7 +11,9 @@ GOOSE_DBSTRING := "host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) password=$(DB
 
 
 
-
+run:
+	@go run .\cmd\app\.
+	
 migrate-up:
 	@echo "Применяю миграции..."
 	@goose -dir ./internal/migrations/ $(GOOSE_DRIVER) $(GOOSE_DBSTRING) up

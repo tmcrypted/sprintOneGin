@@ -2,9 +2,8 @@ package http
 
 import (
 	"net/http"
+	"sprin1/internal/delivery/http/dto"
 	"strconv"
-
-	"sprin1/internal/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,17 +17,12 @@ func (s *Server) RegisterUserRoutes() {
 
 func (s *Server) createUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var body struct {
-			Email    string         `json:"email" binding:"required"`
-			Password string         `json:"password" binding:"required"`
-			FIO      string         `json:"fio" binding:"required"`
-			Role     model.UserRole `json:"role"`
-		}
+		var body dto.CreateUserRequest
 		if err := c.ShouldBindJSON(&body); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		user, err := s.userService.CreateUser(c.Request.Context(), body.Email, body.Password, body.FIO, body.Role)
+		user, err := s.userService.CreateUser(c.Request.Context(), body)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
