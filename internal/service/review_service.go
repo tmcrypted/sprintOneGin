@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"sprin1/internal/model"
 )
@@ -24,7 +25,7 @@ func NewReviewService(reviewRepo ReviewRepository, userRepo UserRepository) *rev
 
 func (s *reviewService) runRatingUpdater() {
 	for userID := range s.ratingCh {
-		ctx := context.Background()
+		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 		avg, err := s.reviewRepo.GetAvgRatingByTargetUser(ctx, userID)
 		if err != nil {
 			log.Printf("review service: get avg for user %d: %v", userID, err)

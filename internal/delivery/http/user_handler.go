@@ -9,14 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterUserRoutes(r *gin.Engine, userService UserService) {
-	g := r.Group("/users")
-	g.POST("/create", createUser(userService))
-	g.GET("/:id", getUser(userService))
-	g.GET("/", getAllUsers(userService))
+func (s *Server) RegisterUserRoutes() {
+	g := s.router.Group("/users")
+	g.POST("/create", s.createUser())
+	g.GET("/:id", s.getUser())
+	g.GET("/", s.getAllUsers())
 }
 
-func createUser(userService UserService) gin.HandlerFunc {
+func (s *Server) createUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var body struct {
 			Email    string         `json:"email" binding:"required"`
@@ -28,7 +28,7 @@ func createUser(userService UserService) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		user, err := userService.CreateUser(c.Request.Context(), body.Email, body.Password, body.FIO, body.Role)
+		user, err := s.userService.CreateUser(c.Request.Context(), body.Email, body.Password, body.FIO, body.Role)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -37,14 +37,14 @@ func createUser(userService UserService) gin.HandlerFunc {
 	}
 }
 
-func getUser(userService UserService) gin.HandlerFunc {
+func (s *Server) getUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
 			return
 		}
-		user, err := userService.GetUser(c.Request.Context(), id)
+		user, err := s.userService.GetUser(c.Request.Context(), id)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -53,9 +53,9 @@ func getUser(userService UserService) gin.HandlerFunc {
 	}
 }
 
-func getAllUsers(userService UserService) gin.HandlerFunc {
+func (s *Server) getAllUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		users, err := userService.GetAllUsers(c.Request.Context())
+		users, err := s.userService.GetAllUsers(c.Request.Context())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
