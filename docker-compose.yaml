@@ -1,0 +1,37 @@
+services:
+  pgdb:
+    image: "postgres:17-alpine"
+    container_name: "pgdb"
+    environment:
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: pwd123
+      POSTGRES_DB: db_test
+    ports:
+      - "54320:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U db_user -d db_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    container_name: "sprin1-app"
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: "8080"
+      DB_HOST: pgdb
+      DB_PORT: "5432"
+      DB_USER: db_user
+      DB_PASSWORD: pwd123
+      DB_NAME: db_test
+      DB_SSLMODE: disable
+    depends_on:
+      pgdb:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,38 @@
+package config
+
+import (
+	"fmt"
+
+	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
+)
+
+type Config struct {
+	AppPort string `env:"APP_PORT"`
+	AppEnv  string `env:"APP_ENV"`
+
+	DBHost     string `env:"DB_HOST"`
+	DBPort     int    `env:"DB_PORT"`
+	DBUser     string `env:"DB_USER"`
+	DBPassword string `env:"DB_PASSWORD"`
+	DBName     string `env:"DB_NAME"`
+	DBSSLMode  string `env:"DB_SSLMODE"`
+}
+
+// Load загружает .env (если есть) и заполняет Config из переменных окружения по тегам. Без дефолтов.
+func Load() (*Config, error) {
+	_ = godotenv.Load()
+
+	cfg := new(Config)
+	if err := env.Parse(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+// DSN возвращает строку подключения к PostgreSQL.
+func (c *Config) DSN() string {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName, c.DBSSLMode)
+	fmt.Println(dsn)
+	return dsn
+}
