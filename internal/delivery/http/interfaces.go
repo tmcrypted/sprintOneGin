@@ -16,3 +16,10 @@ type UserService interface {
 type ReviewService interface {
 	CreateReview(ctx context.Context, body dto.CreateReviewRequest) (*model.Review, error)
 }
+
+type AuthService interface {
+	Login(ctx context.Context, body dto.LoginRequest) (*dto.AuthResponse, error)
+	Register(ctx context.Context, body dto.CreateUserRequest) (*dto.AuthResponse, error)
+	Refresh(ctx context.Context, refreshToken string) (*dto.AuthResponse, error)
+	ParseToken(ctx context.Context, token string) (*model.User, error)
+}

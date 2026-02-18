@@ -38,7 +38,12 @@ func main() {
 	reviewRepo := postgres.NewReviewRepository(pool)
 	reviewService := service.NewReviewService(reviewRepo, userRepo)
 
-	srv := http.NewServer(userService, reviewService)
+	refreshRepo := postgres.NewRefreshSessionRepository(pool)
+	accessTTL := time.Duration(cfg.JWTTTLMinutes) * time.Minute
+	refreshTTL := 30 * 24 * time.Hour
+	authService := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret, accessTTL, refreshTTL)
+
+	srv := http.NewServer(userService, reviewService, authService)
 
 	addr := ":" + cfg.AppPort
 	log.Printf("starting server on %s (env=%s)", addr, cfg.AppEnv)

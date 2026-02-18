@@ -6,15 +6,17 @@ type Server struct {
 	router        *gin.Engine
 	userService   UserService
 	reviewService ReviewService
+	authService   AuthService
 }
 
-func NewServer(userService UserService, reviewService ReviewService) *Server {
+func NewServer(userService UserService, reviewService ReviewService, authService AuthService) *Server {
 	r := gin.Default()
 
 	s := &Server{
 		router:        r,
 		userService:   userService,
 		reviewService: reviewService,
+		authService:   authService,
 	}
 
 	s.RegisterRoutes()

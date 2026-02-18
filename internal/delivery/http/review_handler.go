@@ -8,19 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterReviewRoutes(r *gin.Engine, reviewService ReviewService) {
-	g := r.Group("/reviews")
-	g.POST("/create", createReview(reviewService))
+func (s *Server) RegisterReviewRoutes() {
+	g := s.router.Group("/reviews")
+	g.POST("/create", s.createReview())
 }
 
-func createReview(reviewService ReviewService) gin.HandlerFunc {
+func (s *Server) createReview() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var body dto.CreateReviewRequest
 		if err := c.ShouldBindJSON(&body); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		review, err := reviewService.CreateReview(c.Request.Context(), body)
+		review, err := s.reviewService.CreateReview(c.Request.Context(), body)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
