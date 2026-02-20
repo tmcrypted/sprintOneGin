@@ -13,6 +13,7 @@ func (s *Server) RegisterUserRoutes() {
 	g.POST("/create", s.createUser())
 	g.GET("/:id", s.getUser())
 	g.GET("/", s.getAllUsers())
+	g.DELETE("/:id", s.AuthMiddleware(), s.ModeratorMiddleware(), s.deleteUser())
 }
 
 func (s *Server) createUser() gin.HandlerFunc {
@@ -55,5 +56,22 @@ func (s *Server) getAllUsers() gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, users)
+	}
+}
+
+
+func (s *Server) deleteUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+			return
+		}
+		err = s.userService.DeleteUser(c.Request.Context(), id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "user deleted"})
 	}
 }

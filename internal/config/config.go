@@ -18,8 +18,9 @@ type Config struct {
 	DBName     string `env:"DB_NAME"`
 	DBSSLMode  string `env:"DB_SSLMODE"`
 
-	JWTSecret     string `env:"JWT_SECRET"`
-	JWTTTLMinutes int    `env:"JWT_TTL_MINUTES" envDefault:"60"`
+	JWTSecret         string `env:"JWT_SECRET"`
+	JWTTTLMinutes     int    `env:"JWT_TTL_MINUTES" envDefault:"60"`
+	JWTREFRESHTTLDays int    `env:"JWT_REFRESH_TTL_DAYS" envDefault:"60"`
 }
 
 // Load загружает .env (если есть) и заполняет Config из переменных окружения по тегам. Без дефолтов.

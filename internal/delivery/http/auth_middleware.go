@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strings"
 
+	"sprin1/internal/model"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,6 +34,31 @@ func (s *Server) AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("user", user)
+		c.Next()
+	}
+}
+
+// ModeratorMiddleware проверяет, что аутентифицированный пользователь имеет роль модератора.
+// Должен использоваться после AuthMiddleware.
+func (s *Server) ModeratorMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userAny, exists := c.Get("user")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "user not found in context"})
+			return
+		}
+
+		user, ok := userAny.(*model.User)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid user type in context"})
+			return
+		}
+
+		if user.Role != model.RoleModerator {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "moderator access required"})
+			return
+		}
+
 		c.Next()
 	}
 }

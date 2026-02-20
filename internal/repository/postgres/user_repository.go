@@ -81,3 +81,9 @@ func (r *UserRepository) UpdateRatingAvg(ctx context.Context, userID int64, avg 
 	_, err := r.pool.Exec(ctx, q, avg, userID)
 	return err
 }
+
+func (r *UserRepository) Delete(ctx context.Context, id int64) error {
+	q := `DELETE FROM users WHERE id = $1`
+	_, err := r.pool.Exec(ctx, q, id)
+	return err
+}

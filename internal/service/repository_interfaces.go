@@ -12,6 +12,7 @@ type UserRepository interface {
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetAll(ctx context.Context) ([]*model.User, error)
 	UpdateRatingAvg(ctx context.Context, userID int64, avg float64) error
+	Delete(ctx context.Context, id int64) error
 }
 
 type ReviewRepository interface {

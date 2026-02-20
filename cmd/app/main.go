@@ -40,7 +40,8 @@ func main() {
 
 	refreshRepo := postgres.NewRefreshSessionRepository(pool)
 	accessTTL := time.Duration(cfg.JWTTTLMinutes) * time.Minute
-	refreshTTL := 30 * 24 * time.Hour
+	refreshTTL := time.Duration(cfg.JWTREFRESHTTLDays) * 24 * time.Hour
+
 	authService := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret, accessTTL, refreshTTL)
 
 	srv := http.NewServer(userService, reviewService, authService)

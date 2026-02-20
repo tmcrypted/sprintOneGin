@@ -83,4 +83,3 @@ func setRefreshCookie(c *gin.Context, token string) {
 	maxAge := int(refreshCookieTTL.Seconds())
 	c.SetCookie(refreshCookieName, token, maxAge, "/", "", false, true)
 }
-
