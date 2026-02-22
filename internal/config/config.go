@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
@@ -17,6 +18,10 @@ type Config struct {
 	DBPassword string `env:"DB_PASSWORD"`
 	DBName     string `env:"DB_NAME"`
 	DBSSLMode  string `env:"DB_SSLMODE"`
+
+	JWTSecret         string `env:"JWT_SECRET"`
+	JWTTTLMinutes     int    `env:"JWT_TTL_MINUTES" envDefault:"60"`
+	JWTREFRESHTTLDays int    `env:"JWT_REFRESH_TTL_DAYS" envDefault:"60"`
 }
 
 // Load загружает .env (если есть) и заполняет Config из переменных окружения по тегам. Без дефолтов.
@@ -35,4 +40,14 @@ func (c *Config) DSN() string {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName, c.DBSSLMode)
 	fmt.Println(dsn)
 	return dsn
+}
+
+// AccessTTL возвращает время жизни access токена.
+func (c *Config) AccessTTL() time.Duration {
+	return time.Duration(c.JWTTTLMinutes) * time.Minute
+}
+
+// RefreshTTL возвращает время жизни refresh токена.
+func (c *Config) RefreshTTL() time.Duration {
+	return time.Duration(c.JWTREFRESHTTLDays) * 24 * time.Hour
 }

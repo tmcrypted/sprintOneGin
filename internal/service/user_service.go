@@ -55,3 +55,7 @@ func (s *userService) GetUser(ctx context.Context, id int64) (*model.User, error
 func (s *userService) GetAllUsers(ctx context.Context) ([]*model.User, error) {
 	return s.repo.GetAll(ctx)
 }
+
+func (s *userService) DeleteUser(ctx context.Context, id int64) error {
+	return s.repo.Delete(ctx, id)
+}

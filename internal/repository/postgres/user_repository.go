@@ -39,6 +39,20 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (*model.User, er
 	return &u, nil
 }
 
+func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	q := `SELECT id, email, password_hash, role, fio, photo_url, lat, lng, rating_avg, created_at, updated_at
+		  FROM users WHERE email = $1`
+	var u model.User
+	err := r.pool.QueryRow(ctx, q, email).Scan(
+		&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.FIO, &u.PhotoURL, &u.Lat, &u.Lng, &u.RatingAvg,
+		&u.CreatedAt, &u.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
 func (r *UserRepository) GetAll(ctx context.Context) ([]*model.User, error) {
 	q := `SELECT id, email, password_hash, role, fio, photo_url, lat, lng, rating_avg, created_at, updated_at
 		  FROM users ORDER BY id`
@@ -65,5 +79,11 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*model.User, error) {
 func (r *UserRepository) UpdateRatingAvg(ctx context.Context, userID int64, avg float64) error {
 	q := `UPDATE users SET rating_avg = $1, updated_at = NOW() WHERE id = $2`
 	_, err := r.pool.Exec(ctx, q, avg, userID)
+	return err
+}
+
+func (r *UserRepository) Delete(ctx context.Context, id int64) error {
+	q := `DELETE FROM users WHERE id = $1`
+	_, err := r.pool.Exec(ctx, q, id)
 	return err
 }
