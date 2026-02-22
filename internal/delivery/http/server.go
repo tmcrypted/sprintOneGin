@@ -7,9 +7,10 @@ type Server struct {
 	userService   UserService
 	reviewService ReviewService
 	authService   AuthService
+	jwtSecret     []byte
 }
 
-func NewServer(userService UserService, reviewService ReviewService, authService AuthService) *Server {
+func NewServer(userService UserService, reviewService ReviewService, authService AuthService, jwtSecret string) *Server {
 	r := gin.Default()
 
 	s := &Server{
@@ -17,6 +18,7 @@ func NewServer(userService UserService, reviewService ReviewService, authService
 		userService:   userService,
 		reviewService: reviewService,
 		authService:   authService,
+		jwtSecret:     []byte(jwtSecret),
 	}
 
 	s.RegisterRoutes()

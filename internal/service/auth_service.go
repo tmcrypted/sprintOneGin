@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"time"
 
 	"sprin1/internal/delivery/http/dto"
@@ -17,11 +16,11 @@ import (
 )
 
 type authService struct {
-	userRepo          UserRepository
-	refreshRepo       RefreshSessionRepository
-	jwtSecret         []byte
-	accessTokenTTL    time.Duration
-	refreshTokenTTL   time.Duration
+	userRepo        UserRepository
+	refreshRepo     RefreshSessionRepository
+	jwtSecret       []byte
+	accessTokenTTL  time.Duration
+	refreshTokenTTL time.Duration
 }
 
 func NewAuthService(userRepo UserRepository, refreshRepo RefreshSessionRepository, jwtSecret string, accessTokenTTL, refreshTokenTTL time.Duration) *authService {
@@ -152,44 +151,6 @@ func (s *authService) Refresh(ctx context.Context, refreshToken string) (*dto.Au
 	}, nil
 }
 
-func (s *authService) ParseToken(ctx context.Context, tokenStr string) (*model.User, error) {
-	if tokenStr == "" {
-		return nil, errors.New("token is empty")
-	}
-
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return s.jwtSecret, nil
-	})
-	if err != nil || !token.Valid {
-		return nil, errors.New("invalid token")
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return nil, errors.New("invalid token claims")
-	}
-
-	sub, ok := claims["sub"]
-	if !ok {
-		return nil, errors.New("token subject not found")
-	}
-
-	var userID int64
-	switch v := sub.(type) {
-	case float64:
-		userID = int64(v)
-	case int64:
-		userID = v
-	default:
-		return nil, errors.New("invalid token subject type")
-	}
-
-	return s.userRepo.GetByID(ctx, userID)
-}
-
 func (s *authService) generateAccessToken(user *model.User) (string, error) {
 	now := time.Now()
 	claims := jwt.MapClaims{
@@ -229,4 +190,3 @@ func hashToken(token string) string {
 	sum := sha256.Sum256([]byte(token))
 	return hex.EncodeToString(sum[:])
 }
-

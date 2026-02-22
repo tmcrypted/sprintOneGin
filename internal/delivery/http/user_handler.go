@@ -13,7 +13,7 @@ func (s *Server) RegisterUserRoutes() {
 	g.POST("/create", s.createUser())
 	g.GET("/:id", s.getUser())
 	g.GET("/", s.getAllUsers())
-	g.DELETE("/:id", s.AuthMiddleware(), s.ModeratorMiddleware(), s.deleteUser())
+	g.DELETE("/:id", s.AuthMiddleware, s.ModeratorMiddleware, s.deleteUser())
 }
 
 func (s *Server) createUser() gin.HandlerFunc {
@@ -58,7 +58,6 @@ func (s *Server) getAllUsers() gin.HandlerFunc {
 		c.JSON(http.StatusOK, users)
 	}
 }
-
 
 func (s *Server) deleteUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
