@@ -29,6 +29,12 @@ type ReviewFilter struct {
 	Limit        int
 }
 
+// RatingEventProducer описывает абстракцию продьюсера событий пересчёта рейтинга.
+// Конкретная реализация (Kafka, NATS и т.п.) живёт во внешнем слое.
+type RatingEventProducer interface {
+	SendRatingRecalc(ctx context.Context, userID int64) error
+}
+
 type RefreshSessionRepository interface {
 	Create(ctx context.Context, session *model.RefreshSession) error
 	GetByTokenHash(ctx context.Context, tokenHash string) (*model.RefreshSession, error)
