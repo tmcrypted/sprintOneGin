@@ -5,6 +5,6 @@ func (s *Server) RegisterRoutes() {
 	s.RegisterReviewRoutes()
 	s.RegisterAuthRoutes()
 	// s.RegisterListingRoutes()
-	// s.RegisterPVZRoutes()
+	s.RegisterPVZRoutes()
 
 }
