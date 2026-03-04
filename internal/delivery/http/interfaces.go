@@ -16,6 +16,8 @@ type UserService interface {
 
 type ReviewService interface {
 	CreateReview(ctx context.Context, body dto.CreateReviewRequest) (*model.Review, error)
+	DeleteReview(ctx context.Context, id int64) error
+	GetReviews(ctx context.Context, q dto.GetReviewsQuery) ([]*model.Review, int64, error)
 }
 
 type AuthService interface {
