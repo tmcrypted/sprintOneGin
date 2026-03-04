@@ -18,6 +18,15 @@ type UserRepository interface {
 type ReviewRepository interface {
 	Create(ctx context.Context, review *model.Review) error
 	GetAvgRatingByTargetUser(ctx context.Context, targetUserID int64) (float64, error)
+	Delete(ctx context.Context, id int64) error
+	GetAll(ctx context.Context, filter ReviewFilter) ([]*model.Review, int64, error)
+}
+
+type ReviewFilter struct {
+	PvzID        *int64
+	TargetUserID *int64
+	Offset       int
+	Limit        int
 }
 
 type RefreshSessionRepository interface {
