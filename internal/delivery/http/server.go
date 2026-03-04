@@ -7,10 +7,11 @@ type Server struct {
 	userService   UserService
 	reviewService ReviewService
 	authService   AuthService
+	pvzService    PVZService
 	jwtSecret     []byte
 }
 
-func NewServer(userService UserService, reviewService ReviewService, authService AuthService, jwtSecret string) *Server {
+func NewServer(userService UserService, reviewService ReviewService, authService AuthService, pvzService PVZService, jwtSecret string) *Server {
 	r := gin.Default()
 
 	s := &Server{
@@ -18,6 +19,7 @@ func NewServer(userService UserService, reviewService ReviewService, authService
 		userService:   userService,
 		reviewService: reviewService,
 		authService:   authService,
+		pvzService:    pvzService,
 		jwtSecret:     []byte(jwtSecret),
 	}
 

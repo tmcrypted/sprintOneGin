@@ -10,9 +10,9 @@ import (
 
 func (s *Server) RegisterUserRoutes() {
 	g := s.router.Group("/users")
-	g.POST("/create", s.createUser())
-	g.GET("/:id", s.getUser())
-	g.GET("/", s.getAllUsers())
+	g.POST("/create", s.AuthMiddleware, s.createUser())
+	g.GET("/:id", s.AuthMiddleware, s.getUser())
+	g.GET("/", s.AuthMiddleware, s.getAllUsers())
 	g.DELETE("/:id", s.AuthMiddleware, s.ModeratorMiddleware, s.deleteUser())
 }
 

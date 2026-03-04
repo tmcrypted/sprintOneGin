@@ -25,3 +25,16 @@ type RefreshSessionRepository interface {
 	GetByTokenHash(ctx context.Context, tokenHash string) (*model.RefreshSession, error)
 	DeleteByID(ctx context.Context, id int64) error
 }
+
+type PVZFilter struct {
+	Status *model.PVZStatus
+	Offset int
+	Limit  int
+}
+
+type PVZRepository interface {
+	GetAll(ctx context.Context, filter PVZFilter) ([]*model.PVZ, int64, error)
+	Create(ctx context.Context, pvz *model.PVZ) error
+	GetByID(ctx context.Context, id int64) (*model.PVZ, error)
+	Moderate(ctx context.Context, id int64, status model.PVZStatus, moderatorID int64) error
+}
